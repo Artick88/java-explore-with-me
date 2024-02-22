@@ -1,0 +1,31 @@
+version: '3.1'
+services:
+
+  stats-server:
+    build: ./stats-service/stats-server
+    container_name: stats-server
+    hostname: stats-server
+    ports:
+      - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - DB_HOTS=stats-db
+      - DB_PORT=5432
+      - DB_NAME=stats
+      - POSTGRES_USER=rootStats
+      - POSTGRES_PASSWORD=rootStats
+      - SERVER_PORT=9090
+
+  stats-db:
+    image: postgres:13.7-alpine
+    container_name: stats-db
+    hostname: stats-db
+    volumes:
+      - /var/lib/postgresql/data/
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=stats
+      - POSTGRES_USER=rootStats
+      - POSTGRES_PASSWORD=rootStats
