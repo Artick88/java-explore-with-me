@@ -2,7 +2,7 @@ version: '3.1'
 services:
 
   stats-server:
-    build: ./statsService/statsServer
+    build: ./stats-service/stats-server
     container_name: stats-server
     hostname: stats-server
     ports:
