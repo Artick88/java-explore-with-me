@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 public class StatClient {
 
-    @Value("${stat.server.url}")
+    @Value("${stat.server.url:localhost}")
     private String url;
 
     private final RestTemplate restTemplate;
@@ -31,8 +31,9 @@ public class StatClient {
 
     public void save(EventDto createDto) {
         try {
-            restTemplate.exchange(url + "/hit", HttpMethod.POST, new HttpEntity<>(createDto, getDefaultHeaders()),
-                    Object.class);
+//TODO:временно заглушил
+//            restTemplate.exchange(url + "/hit", HttpMethod.POST, new HttpEntity<>(createDto, getDefaultHeaders()),
+//                    Object.class);
         } catch (HttpStatusCodeException e) {
             throw new CallServerException("При вызове сервера произошла ошибка");
         }

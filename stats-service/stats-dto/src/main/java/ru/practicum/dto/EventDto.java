@@ -2,6 +2,7 @@ package ru.practicum.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Schema(name = "Событие", description = "ДТО фиксации статистики")
+@Builder
 public class EventDto {
 
     @Schema(description = "Идентификатор сервиса для которого записывается информация", example = "ewm-main-service")
