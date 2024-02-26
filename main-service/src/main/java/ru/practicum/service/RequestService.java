@@ -3,11 +3,12 @@ package ru.practicum.service;
 import ru.practicum.model.entity.Request;
 import ru.practicum.model.UpdateRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface RequestService {
 
-    Request create(Long userId, Long eventId);
+    Request create(Long userId, Long eventId, HttpServletRequest httpServletRequest);
 
     Request cancelRequest(Long userId, Long requestId);
 

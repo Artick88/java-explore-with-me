@@ -2,12 +2,14 @@ package ru.practicum.dto.compilation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
 @Data
 public class CompilationUpdateDto {
 
+    @Length(min = 1, max = 50)
     @Schema(description = "Заголовок подборки", example = "Летние концерты")
     private String title;
 

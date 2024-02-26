@@ -82,4 +82,17 @@ public class ErrorHandle {
                 .status(HttpStatus.BAD_REQUEST)
                 .build();
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleNotValidaRequestException(NotValidRequestException exception) {
+        log.info(exception.getMessage());
+        return ApiError.builder()
+                .timestamp(LocalDateTime.now())
+                .message(exception.getMessage())
+                .errors(Arrays.toString(exception.getStackTrace()))
+                .reason(exception.getReason())
+                .status(HttpStatus.BAD_REQUEST)
+                .build();
+    }
 }

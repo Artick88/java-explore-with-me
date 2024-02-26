@@ -31,7 +31,7 @@ public class PublicCompilationController {
 
     @GetMapping
     @Operation(summary = "Получение подборок событий")
-    public List<CompilationDto> getAll(@RequestParam Boolean pinned,
+    public List<CompilationDto> getAll(@RequestParam(required = false) Boolean pinned,
                                        @RequestParam(defaultValue = "0") int from,
                                        @RequestParam(defaultValue = "10") int size) {
         log.info("Get compilation filter: pinned {}, from {}, size {}", pinned, from, size);

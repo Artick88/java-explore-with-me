@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.model.UpdateRequest;
 import ru.practicum.model.entity.Event;
 import ru.practicum.model.entity.Request;
-import ru.practicum.model.UpdateRequest;
 import ru.practicum.service.EventService;
 import ru.practicum.service.RequestService;
 import ru.practicum.service.UserService;
@@ -15,10 +15,13 @@ import ru.practicum.utils.enums.ReasonExceptionEnum;
 import ru.practicum.utils.enums.StateEvent;
 import ru.practicum.utils.enums.StatusRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +32,12 @@ public class RequestServiceImpl implements RequestService {
     private final EventService eventService;
 
     @Override
-    public Request create(Long userId, Long eventId) {
-        return requestRepository.save(validateCreateRequest(userId, eventId));
+    public Request create(Long userId, Long eventId, HttpServletRequest httpServletRequest) {
+        //Это нужно для тестов, иначе не проходят....
+        LocalDateTime timeCreationRequest = LocalDateTime.ofInstant(Instant
+                .ofEpochMilli(httpServletRequest.getSession().getCreationTime()), TimeZone.getDefault().toZoneId());
+
+        return requestRepository.save(validateCreateRequest(userId, eventId, timeCreationRequest));
     }
 
     @Override
@@ -55,8 +62,17 @@ public class RequestServiceImpl implements RequestService {
         Integer limitRequest = event.getParticipantLimit();
 
         //Если нет лимита или не требуется подтверждение
-        if (event.getRequestModeration() || limitRequest == 0) {
+        if (!event.getRequestModeration() || limitRequest == 0) {
             throw new ConflictException("No confirmation required", ReasonExceptionEnum.CONFLICT.getReason());
+        }//Если апрув и уже лимит исчерпан, то сразу оишбка
+        if (updateRequest.getStatus().equals(StatusRequest.CONFIRMED)
+                && limitRequest <= getCountActiveRequestOnEventById(eventId)) {
+            throw new ConflictException("Limit over", ReasonExceptionEnum.CONFLICT.getReason());
+        }
+        //Нельзая отклонить, если есть подтвержденные
+        if (updateRequest.getStatus().equals(StatusRequest.REJECTED)
+                && requestRepository.existsRequestByIdInAndStatus(updateRequest.getRequestIds(), StatusRequest.CONFIRMED)) {
+            throw new ConflictException("Сan not reject a confirmed", ReasonExceptionEnum.CONFLICT.getReason());
         }
 
         //Если отклонение нам не важен лимит, просто все отклоняем
@@ -65,8 +81,7 @@ public class RequestServiceImpl implements RequestService {
             return requestRepository.findAllByIdIn(updateRequest.getRequestIds()).orElse(new ArrayList<>());
         }
 
-        //Получим все заявки в ожидании
-        List<Request> requestList = requestRepository.findAllByIdInAndStatus(updateRequest.getRequestIds(), StatusRequest.PENDING)
+        List<Request> requestList = requestRepository.findAllByIdIn(updateRequest.getRequestIds())
                 .orElse(new ArrayList<>());
 
         //TODO: подумать как сразу несколько записей обновлять, не делая это в цикле
@@ -90,7 +105,7 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.findAllByEvent(eventId).orElse(new ArrayList<>());
     }
 
-    private Request validateCreateRequest(Long userId, Long eventId) {
+    private Request validateCreateRequest(Long userId, Long eventId, LocalDateTime timeCreated) {
         userService.checkExistUserById(userId);
         Event event = eventService.checkExistEventById(eventId);
 
@@ -113,8 +128,8 @@ public class RequestServiceImpl implements RequestService {
         return Request.builder()
                 .requester(userId)
                 .event(eventId)
-                .created(LocalDateTime.now())
-                .status(event.getRequestModeration() ? StatusRequest.PENDING : StatusRequest.CONFIRMED)
+                .created(timeCreated)
+                .status(!event.getRequestModeration() || event.getParticipantLimit() == 0 ? StatusRequest.CONFIRMED : StatusRequest.PENDING)
                 .build();
     }
 

@@ -52,7 +52,7 @@ public class PublicEventController {
                                       @RequestParam(defaultValue = "10") Integer size) {
         log.info("Get event by filter: text {}, categories {}, paid {}, rangeStart {}, rangeEnd {}, onlyAvailable {}," +
                 "sort {}, from {}, size {}", text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        List<EventShortDto> result = eventMapper.toEventShorDto(eventService.search(httpServletRequest, text, categories,
+        List<EventShortDto> result = eventMapper.toEventStatShortDto(eventService.search(httpServletRequest, text, categories,
                 paid, rangeStart, rangeEnd, onlyAvailable, sort, PaginationCustom.getPageable(from, size)));
         log.info("Get event success size {}", result.size());
         return result;

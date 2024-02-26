@@ -10,6 +10,7 @@ import ru.practicum.dto.request.RequestDto;
 import ru.practicum.mapper.RequestMapper;
 import ru.practicum.service.RequestService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -36,9 +37,10 @@ public class PrivateRequestController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Добавление запроса от текущего пользователя на участие в событии")
     public RequestDto create(@PathVariable Long userId,
-                             @RequestParam Long eventId) {
+                             @RequestParam Long eventId,
+                             HttpServletRequest httpServletRequest) {
         log.info("User {} create request in event {}", userId, eventId);
-        RequestDto result = requestMapper.toRequestDto(requestService.create(userId, eventId));
+        RequestDto result = requestMapper.toRequestDto(requestService.create(userId, eventId, httpServletRequest));
         log.info("User create request success");
         return result;
     }

@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum StateActionEvent {
-    PUBLISH_EVENT(StateEvent.PUBLISHED), REJECT_EVENT(StateEvent.CANCELED);
+public enum StateUserActionEvent {
+    SEND_TO_REVIEW(StateEvent.PENDING), CANCEL_REVIEW(StateEvent.CANCELED);
 
     private final StateEvent stateEvent;
 }
