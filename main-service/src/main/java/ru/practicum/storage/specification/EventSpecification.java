@@ -38,12 +38,12 @@ public class EventSpecification {
 
     public static Specification<Event> hasRangeDateStart(LocalDateTime rangeStart) {
         return (root, query, criteriaBuilder) -> rangeStart == null ? criteriaBuilder.conjunction()
-                : criteriaBuilder.lessThan(root.get("eventDate"), rangeStart);
+                : criteriaBuilder.greaterThan(root.get("eventDate"), rangeStart);
     }
 
     public static Specification<Event> hasRangeDateEnd(LocalDateTime rangeEnd) {
         return (root, query, criteriaBuilder) -> rangeEnd == null ? criteriaBuilder.conjunction()
-                : criteriaBuilder.greaterThan(root.get("eventDate"), rangeEnd);
+                : criteriaBuilder.lessThan(root.get("eventDate"), rangeEnd);
     }
 
     public static Specification<Event> isPaid(Boolean paid) {
@@ -53,7 +53,7 @@ public class EventSpecification {
 
     public static Specification<Event> hasCategories(List<Long> categories) {
         return ((root, query, criteriaBuilder) ->
-                categories == null || categories.isEmpty() ? criteriaBuilder.conjunction() : root.get("id").in(categories));
+                categories == null || categories.isEmpty() ? criteriaBuilder.conjunction() : root.get("category").in(categories));
     }
 
     public static Specification<Event> hasUsers(List<Long> users) {

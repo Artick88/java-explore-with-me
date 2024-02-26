@@ -10,6 +10,7 @@ import ru.practicum.dto.event.*;
 import ru.practicum.dto.request.RequestDto;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.RequestMapper;
+import ru.practicum.mapper.UpdateEventMapper;
 import ru.practicum.service.EventService;
 import ru.practicum.service.RequestService;
 import ru.practicum.utils.PaginationCustom;
@@ -26,6 +27,7 @@ public class PrivateEventController {
 
     private final EventService eventService;
     private final EventMapper eventMapper;
+    private final UpdateEventMapper updateEventMapper;
     private final RequestService requestService;
     private final RequestMapper requestMapper;
 
@@ -64,10 +66,10 @@ public class PrivateEventController {
     @Operation(summary = "Изменение события добавленного текущим пользователем")
     public EventFullDto update(@PathVariable Long userId,
                                @PathVariable Long eventId,
-                               @Valid @RequestParam EventUpdateUserDto eventUpdateUserDto) {
+                               @Valid @RequestBody EventUpdateUserDto eventUpdateUserDto) {
         log.info("User {} update event {} data {}", userId, eventId, eventUpdateUserDto);
         EventFullDto result = eventMapper.toEventFullDto(eventService.update(userId, eventId,
-                eventMapper.toEvent(eventUpdateUserDto)));
+                updateEventMapper.toEvent(eventUpdateUserDto)));
         log.info("User update event success");
         return result;
     }

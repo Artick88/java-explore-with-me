@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicUpdate;
-import ru.practicum.model.entity.Category;
-import ru.practicum.model.entity.User;
 import ru.practicum.utils.enums.StateEvent;
 
 import javax.persistence.*;
@@ -17,7 +14,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "events")
-@AllArgsConstructor
 public class Event {
 
     @Id
@@ -44,11 +40,9 @@ public class Event {
     @JoinColumn(name = "initiator_id")
     private User initiator;
 
-    @Column(name = "lat")
-    private Float lat;
-
-    @Column(name = "lon")
-    private Float lon;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     @Column(name = "paid")
     private Boolean paid;
@@ -70,5 +64,5 @@ public class Event {
     private String title;
 
     @Column(name = "views")
-    private Integer countViews;
+    private Integer views;
 }

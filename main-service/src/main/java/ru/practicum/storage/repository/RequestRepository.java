@@ -19,7 +19,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     Optional<List<Request>> findAllByEvent(Long eventId);
 
-    Optional<List<Request>> findAllByIdInAndStatus(List<Long> ids, StatusRequest statusRequest);
+    boolean existsRequestByIdInAndStatus(List<Long> ids, StatusRequest statusRequest);
 
     Optional<List<Request>> findAllByIdIn(List<Long> ids);
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventUpdateAdminDto;
 import ru.practicum.mapper.EventMapper;
+import ru.practicum.mapper.UpdateEventMapper;
 import ru.practicum.service.EventService;
 import ru.practicum.utils.PaginationCustom;
 import ru.practicum.utils.enums.StateEvent;
@@ -26,6 +27,7 @@ public class AdminEventController {
 
     private final EventService eventService;
     private final EventMapper eventMapper;
+    private final UpdateEventMapper updateEventMapper;
 
     @PatchMapping("/{eventId}")
     @Operation(summary = "Редактирование данных события и его статуса (отклонение/публикация).")
@@ -33,23 +35,23 @@ public class AdminEventController {
                                @Valid @RequestBody EventUpdateAdminDto eventUpdateAdminDto) {
         log.info("Admin update event {}, data {}", eventId, eventUpdateAdminDto);
         EventFullDto result = eventMapper.toEventFullDto(eventService.updateIsAdmin(eventId,
-                eventMapper.toEvent(eventUpdateAdminDto)));
+                updateEventMapper.toEvent(eventUpdateAdminDto)));
         log.info("Admin update event success");
         return result;
     }
 
     @GetMapping
     @Operation(summary = "Поиск событий")
-    public List<EventFullDto> getAll(@RequestParam List<Long> users,
-                                     @RequestParam List<StateEvent> states,
-                                     @RequestParam List<Long> categories,
+    public List<EventFullDto> getAll(@RequestParam(required = false) List<Long> users,
+                                     @RequestParam(required = false) List<StateEvent> states,
+                                     @RequestParam(required = false) List<Long> categories,
                                      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                                      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                      @RequestParam(defaultValue = "0") Integer from,
                                      @RequestParam(defaultValue = "10") Integer size) {
         log.info("Admin get event by filter: users {}, states {}, categories {},  rangeStart {}, rangeEnd {}, from {}, size {}",
                 users, states, categories, rangeStart, rangeEnd, from, size);
-        List<EventFullDto> result = eventMapper.toEventFullDto(eventService.searchAdmin(users, states, categories,
+        List<EventFullDto> result = eventMapper.toEventStatFullDto(eventService.searchAdmin(users, states, categories,
                 rangeStart, rangeEnd, PaginationCustom.getPageable(from, size)));
         log.info("Admin get event by filter success {}", result.size());
         return result;

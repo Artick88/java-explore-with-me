@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class EventCreateDto {
+
     @Schema(description = "Краткое описание события", example = "Сплав на байдарках похож на полет.")
     @NotBlank
     @Length(max = 2000, min = 20)
@@ -38,7 +39,7 @@ public class EventCreateDto {
     private LocationDto location;
 
     @Schema(defaultValue = "false", description = "Нужно ли оплачивать участие в событии", example = "true")
-    private boolean paid;
+    private Boolean paid;
 
     @Schema(description = "Ограничение на количество участников. Значение 0 - означает отсутствие ограничения",
             example = "10", defaultValue = "0")
@@ -48,7 +49,7 @@ public class EventCreateDto {
     @Schema(defaultValue = "true", example = "false", description = "Нужна ли пре-модерация заявок на участие. " +
             "Если true, то все заявки будут ожидать подтверждения инициатором события. " +
             "Если false - то будут подтверждаться автоматически.")
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
     @NotBlank
     @Length(max = 120, min = 3)
