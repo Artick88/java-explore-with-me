@@ -10,7 +10,6 @@ import ru.practicum.dto.EventDto;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.NotValidRequestException;
-import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.UpdateEventMapper;
 import ru.practicum.model.EventStat;
 import ru.practicum.model.entity.Event;
@@ -48,7 +47,6 @@ public class EventServiceImpl implements EventService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final StatClient statClient;
-    private final EventMapper eventMapper;
     private final UpdateEventMapper updateEventMapper;
     private final RequestRepository requestRepository;
 
@@ -148,8 +146,6 @@ public class EventServiceImpl implements EventService {
 
         //Добавим в статистику
         updateStat(httpServletRequest);
-
-        //TODO: нужно ли тут увеличивать счет просмотра???
 
         return prepareEventState(eventRepository.findAll(EventSpecification.needSort(specificationSearch, sort), page)
                 .stream().collect(Collectors.toList()));

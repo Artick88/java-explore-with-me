@@ -1,17 +1,18 @@
 package ru.practicum.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 import ru.practicum.dto.event.EventRequestStatusUpdateRequestDto;
 import ru.practicum.dto.event.EventRequestStatusUpdateResultDto;
 import ru.practicum.dto.request.RequestDto;
-import ru.practicum.model.entity.Request;
 import ru.practicum.model.UpdateRequest;
+import ru.practicum.model.entity.Request;
 import ru.practicum.utils.enums.StatusRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface RequestMapper {
     RequestDto toRequestDto(Request request);
 

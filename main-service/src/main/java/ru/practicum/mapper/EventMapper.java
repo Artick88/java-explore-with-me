@@ -26,7 +26,6 @@ public interface EventMapper {
     @Mapping(target = "requestModeration", defaultValue = "true")
     Event toEvent(EventCreateDto eventCreateDto);
 
-
     EventFullDto toEventFullDto(Event event);
 
     List<EventFullDto> toEventFullDto(List<Event> events);
@@ -34,7 +33,6 @@ public interface EventMapper {
     List<EventShortDto> toEventShorDto(List<Event> events);
 
     EventShortDto toEventShorDto(Event event);
-
 
     default EventFullDto toEventStatFullDto(EventStat eventStat) {
         if (eventStat == null) {

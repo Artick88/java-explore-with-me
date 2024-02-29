@@ -36,7 +36,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMissingServletRequestParameterException(final MissingServletRequestParameterException exception) {
-        log.info(exception.getMessage());
+        log.info("Exception: {}", exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 }

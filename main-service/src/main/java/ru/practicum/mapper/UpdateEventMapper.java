@@ -6,7 +6,7 @@ import ru.practicum.dto.event.EventUpdateUserDto;
 import ru.practicum.model.entity.Event;
 import ru.practicum.utils.enums.StateEvent;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UpdateEventMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
