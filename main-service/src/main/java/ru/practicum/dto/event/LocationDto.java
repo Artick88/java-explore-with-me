@@ -3,8 +3,6 @@ package ru.practicum.dto.event;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-
 @Data
 @Schema(description = "Широта и долгота места проведения события")
 public class LocationDto {

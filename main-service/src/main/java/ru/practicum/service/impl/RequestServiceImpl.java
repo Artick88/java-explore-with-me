@@ -2,6 +2,7 @@ package ru.practicum.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.UpdateRequest;
@@ -16,12 +17,12 @@ import ru.practicum.utils.enums.StateEvent;
 import ru.practicum.utils.enums.StatusRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,33 +60,21 @@ public class RequestServiceImpl implements RequestService {
 
         userService.checkExistUserById(userId);
         Event event = eventService.checkExistEventById(eventId);
-        Integer limitRequest = event.getParticipantLimit();
-
-        //Если нет лимита или не требуется подтверждение
-        if (!event.getRequestModeration() || limitRequest == 0) {
-            throw new ConflictException("No confirmation required", ReasonExceptionEnum.CONFLICT.getReason());
-        }//Если апрув и уже лимит исчерпан, то сразу оишбка
-        if (updateRequest.getStatus().equals(StatusRequest.CONFIRMED)
-                && limitRequest <= getCountActiveRequestOnEventById(eventId)) {
-            throw new ConflictException("Limit over", ReasonExceptionEnum.CONFLICT.getReason());
-        }
-        //Нельзая отклонить, если есть подтвержденные
-        if (updateRequest.getStatus().equals(StatusRequest.REJECTED)
-                && requestRepository.existsRequestByIdInAndStatus(updateRequest.getRequestIds(), StatusRequest.CONFIRMED)) {
-            throw new ConflictException("Сan not reject a confirmed", ReasonExceptionEnum.CONFLICT.getReason());
-        }
-
-        //Если отклонение нам не важен лимит, просто все отклоняем
-        if (updateRequest.getStatus().equals(StatusRequest.REJECTED)) {
-            requestRepository.updateStatusByIds(updateRequest.getRequestIds(), updateRequest.getStatus());
-            return requestRepository.findAllByIdIn(updateRequest.getRequestIds()).orElse(new ArrayList<>());
-        }
+        validateUpdateStatus(event, updateRequest);
 
         List<Request> requestList = requestRepository.findAllByIdIn(updateRequest.getRequestIds())
                 .orElse(new ArrayList<>());
 
+        Integer limitRequest = event.getParticipantLimit();
+
+        //Если отклонение нам не важен лимит, просто все отклоняем
+        if (updateRequest.getStatus().equals(StatusRequest.REJECTED)) {
+            requestRepository.updateStatusByIds(updateRequest.getRequestIds(), updateRequest.getStatus());
+            return requestList.stream().peek(request -> request.setStatus(updateRequest.getStatus()))
+                    .collect(Collectors.toList());
+        }
+
         //TODO: подумать как сразу несколько записей обновлять, не делая это в цикле
-        //В цикле обновляем статусы
         for (Request request : requestList) {
             //Проверяем лимит перед каждым изменением
             if (limitRequest <= getCountActiveRequestOnEventById(eventId)) {
@@ -96,6 +85,23 @@ public class RequestServiceImpl implements RequestService {
         }
 
         return requestList;
+    }
+
+    private void validateUpdateStatus(Event event, UpdateRequest updateRequest) {
+        //Если нет лимита или не требуется подтверждение
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
+            throw new ConflictException("No confirmation required", ReasonExceptionEnum.CONFLICT.getReason());
+        }
+        //Если апрув и уже лимит исчерпан, то сразу оишбка
+        if (updateRequest.getStatus().equals(StatusRequest.CONFIRMED)
+                && event.getParticipantLimit() <= getCountActiveRequestOnEventById(event.getId())) {
+            throw new ConflictException("Limit over", ReasonExceptionEnum.CONFLICT.getReason());
+        }
+        //Нельзая отклонить, если есть подтвержденные
+        if (updateRequest.getStatus().equals(StatusRequest.REJECTED)
+                && requestRepository.existsRequestByIdInAndStatus(updateRequest.getRequestIds(), StatusRequest.CONFIRMED)) {
+            throw new ConflictException("Сan not reject a confirmed", ReasonExceptionEnum.CONFLICT.getReason());
+        }
     }
 
     @Override

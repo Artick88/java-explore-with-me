@@ -29,7 +29,7 @@ public interface EventService {
     Event getById(Long eventId, HttpServletRequest httpServletRequest);
 
     List<EventStat> search(HttpServletRequest httpServletRequest, String text, List<Long> categories, Boolean paid,
-                       LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortEvent sort, Pageable page);
+                           LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortEvent sort, Pageable page);
 
     List<EventStat> searchAdmin(List<Long> users, List<StateEvent> states, List<Long> categories, LocalDateTime rangeStart,
                                 LocalDateTime rangeEnd, Pageable page);

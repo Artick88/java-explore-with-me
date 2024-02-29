@@ -15,6 +15,7 @@ public interface CompilationService {
     void deleteById(Long compId);
 
     CompilationDto getById(Long compId);
+
     List<CompilationDto> getAll(Boolean pinned, Pageable page);
 
 }

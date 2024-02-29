@@ -19,7 +19,7 @@ public class CompilationDto {
     private Long id;
 
     @NotBlank
-    @Schema(description = "")
+    @Schema(description = "Наименование подборки")
     private String title;
 
     @NotNull

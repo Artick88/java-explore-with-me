@@ -5,7 +5,7 @@ import ru.practicum.dto.compilation.CompilationCreateDto;
 import ru.practicum.dto.compilation.CompilationUpdateDto;
 import ru.practicum.model.entity.Compilation;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CompilationMapper {
     @Mapping(source = "pinned", target = "pinned", defaultValue = "false")
     Compilation toCompilation(CompilationCreateDto compilationCreateDto);

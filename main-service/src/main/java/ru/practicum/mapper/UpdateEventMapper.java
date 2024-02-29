@@ -6,7 +6,7 @@ import ru.practicum.dto.event.EventUpdateUserDto;
 import ru.practicum.model.entity.Event;
 import ru.practicum.utils.enums.StateEvent;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UpdateEventMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -21,7 +21,7 @@ public interface UpdateEventMapper {
     Event toEvent(EventUpdateAdminDto eventUpdateAdminDto);
 
     @Named("actionAdminToStateNamed")
-    default StateEvent ActionAdminToState(EventUpdateAdminDto eventUpdateAdminDto) {
+    default StateEvent actionAdminToState(EventUpdateAdminDto eventUpdateAdminDto) {
         if (eventUpdateAdminDto.getStateAction() == null) {
             return null;
         }
@@ -29,7 +29,7 @@ public interface UpdateEventMapper {
     }
 
     @Named("actionUserToStateNamed")
-    default StateEvent ActionUserToState(EventUpdateUserDto eventUpdateUserDto) {
+    default StateEvent actionUserToState(EventUpdateUserDto eventUpdateUserDto) {
         if (eventUpdateUserDto.getStateAction() == null) {
             return null;
         }
@@ -37,7 +37,7 @@ public interface UpdateEventMapper {
     }
 
     @AfterMapping
-    default void CategoryToEntity(@MappingTarget Event event) {
+    default void categoryToEntity(@MappingTarget Event event) {
         if (event.getCategory().getId() == null) {
             event.setCategory(null);
         }

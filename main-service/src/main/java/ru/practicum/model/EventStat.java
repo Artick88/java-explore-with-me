@@ -11,9 +11,6 @@ import ru.practicum.model.entity.Event;
 @NoArgsConstructor
 @SuperBuilder
 public class EventStat {
-
     private Event event;
-
     private Integer confirmedRequests;
-
 }
