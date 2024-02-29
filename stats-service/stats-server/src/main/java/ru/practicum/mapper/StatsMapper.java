@@ -21,7 +21,7 @@ public interface StatsMapper {
     List<StatsDto> toStatsDto(List<Stats> stats);
 
     @Named("dateTimeParse")
-    default LocalDateTime DateTimeParse(String timestamp) {
+    default LocalDateTime dateTimeParse(String timestamp) {
         return LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }
