@@ -91,7 +91,8 @@ public class RequestServiceImpl implements RequestService {
         //Если нет лимита или не требуется подтверждение
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             throw new ConflictException("No confirmation required", ReasonExceptionEnum.CONFLICT.getReason());
-        }//Если апрув и уже лимит исчерпан, то сразу оишбка
+        }
+        //Если апрув и уже лимит исчерпан, то сразу оишбка
         if (updateRequest.getStatus().equals(StatusRequest.CONFIRMED)
                 && event.getParticipantLimit() <= getCountActiveRequestOnEventById(event.getId())) {
             throw new ConflictException("Limit over", ReasonExceptionEnum.CONFLICT.getReason());
