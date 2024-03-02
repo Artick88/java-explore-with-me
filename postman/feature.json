@@ -1,0 +1,977 @@
+{
+  "info": {
+    "_postman_id": "2c81bd7b-f85f-4a07-b353-52525699214b",
+    "name": "Test Explore With Me - Rating",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Событие не прошло",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 409 и данные в формате json\", function () {\r",
+              "    pm.response.to.have.status(409);\r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/events/:eventId/evaluate?operation=LIKE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ":eventId",
+            "evaluate"
+          ],
+          "query": [
+            {
+              "key": "operation",
+              "value": "LIKE"
+            }
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "2",
+              "description": "(Required) id текущего пользователя"
+            },
+            {
+              "key": "eventId",
+              "value": "2",
+              "description": "(Required) id события"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Отсутствует подтвержденная заявка",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const main = async () => {\r",
+              "    const api = new API(pm);\r",
+              "    const rnd = new RandomUtils();\r",
+              "\r",
+              "    try {\r",
+              "        const user = await api.addUser(rnd.getUser());\r",
+              "        const category = await api.addCategory(rnd.getCategory());\r",
+              "        let eventBody = rnd.getEvent(category.id);\r",
+              "        eventBody['requestModeration'] = false;\r",
+              "        let event = await api.addEvent(user.id, eventBody);\r",
+              "        event = await api.publishEvent(event.id);\r",
+              "\r",
+              "\r",
+              "        const submittedUser = await api.addUser(rnd.getUser());\r",
+              "        const requestToJoin = await api.publishParticipationRequest(event.id, submittedUser.id);\r",
+              "        \r",
+              "        pm.collectionVariables.set('uid', submittedUser.id);\r",
+              "        pm.collectionVariables.set('eid', event.id);\r",
+              "\r",
+              "    } catch(err) {\r",
+              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "const interval = setInterval(() => {}, 1000);\r",
+              "\r",
+              "setTimeout(async () => \r",
+              "    {\r",
+              "        try {\r",
+              "            // выполняем наш скрипт\r",
+              "            await main();\r",
+              "        } catch (e) {\r",
+              "            console.error(e);\r",
+              "        } finally {\r",
+              "            clearInterval(interval);\r",
+              "        }\r",
+              "    },  \r",
+              "    100 \r",
+              ");"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/events/:eventId/evaluate?operation=LIKE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ":eventId",
+            "evaluate"
+          ],
+          "query": [
+            {
+              "key": "operation",
+              "value": "LIKE"
+            }
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "3",
+              "description": "(Required) id текущего пользователя"
+            },
+            {
+              "key": "eventId",
+              "value": "2",
+              "description": "(Required) id события"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Событие лайк - успех",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 201\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/events/:eventId/evaluate?operation=LIKE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ":eventId",
+            "evaluate"
+          ],
+          "query": [
+            {
+              "key": "operation",
+              "value": "LIKE"
+            }
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "2",
+              "description": "(Required) id текущего пользователя"
+            },
+            {
+              "key": "eventId",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Проверка рейтинга события после лайка",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Событие должно содержать поля: countLike, countDislike, rating\", function () {\r",
+              "pm.expect(target).to.have.property('countLike');\r",
+              "pm.expect(target).to.have.property('countDislike');\r",
+              "pm.expect(target).to.have.property('rating');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать\", function () {\r",
+              "    pm.expect(1).equal(target.countLike, 'Кол-во лайков не соответствует');\r",
+              "    pm.expect(0).equal(target.countDislike, 'Кол-во дизлайков не соответствует');\r",
+              "    pm.expect(10.0).equal(target.rating, 'Рейтинг не соответствует');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/events/:id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        },
+        "description": "Обратите внимание:\n- событие должно быть опубликовано\n- информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов\n- информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики"
+      },
+      "response": []
+    },
+    {
+      "name": "Проверка рейтинга пользователя после лайка",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Пользователи должны содержать поля: id, name, email\", function () {\r",
+              "    pm.expect(target[0]).to.have.property('id');\r",
+              "    pm.expect(target[0]).to.have.property('name');\r",
+              "    pm.expect(target[0]).to.have.property('email');\r",
+              "    pm.expect(target[0]).to.have.property('rating');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Должен быть найден только один пользователь по заданному фильтру\", function () {\r",
+              "    pm.expect(target.length).to.eql(1);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать\", function () {\r",
+              "    pm.expect(target[0].id).equal(1);\r",
+              "    pm.expect(target[0].rating).equal(10.0);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users?ids=1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "users"
+          ],
+          "query": [
+            {
+              "key": "ids",
+              "value": "1",
+              "description": "id пользователей"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Событие дизлайк - успех",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/events/:eventId/evaluate?operation=DISLIKE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ":eventId",
+            "evaluate"
+          ],
+          "query": [
+            {
+              "key": "operation",
+              "value": "DISLIKE"
+            }
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "3",
+              "description": "(Required) id текущего пользователя"
+            },
+            {
+              "key": "eventId",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Проверка рейтинга события после дизлайка",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Событие должно содержать поля: countLike, countDislike, rating\", function () {\r",
+              "pm.expect(target).to.have.property('countLike');\r",
+              "pm.expect(target).to.have.property('countDislike');\r",
+              "pm.expect(target).to.have.property('rating');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать\", function () {\r",
+              "    pm.expect(1).equal(target.countLike, 'Кол-во лайков не соответствует');\r",
+              "    pm.expect(1).equal(target.countDislike, 'Кол-во дизлайков не соответствует');\r",
+              "    pm.expect(5.0).equal(target.rating, 'Рейтинг не соответствует');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/events/:id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        },
+        "description": "Обратите внимание:\n- событие должно быть опубликовано\n- информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов\n- информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики"
+      },
+      "response": []
+    },
+    {
+      "name": "Проверка рейтинга пользователя после дизлайка",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Пользователи должны содержать поля: id, name, email\", function () {\r",
+              "    pm.expect(target[0]).to.have.property('id');\r",
+              "    pm.expect(target[0]).to.have.property('name');\r",
+              "    pm.expect(target[0]).to.have.property('email');\r",
+              "    pm.expect(target[0]).to.have.property('rating');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Должен быть найден только один пользователь по заданному фильтру\", function () {\r",
+              "    pm.expect(target.length).to.eql(1);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать\", function () {\r",
+              "    pm.expect(target[0].id).equal(1);\r",
+              "    pm.expect(target[0].rating).equal(5.0);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin/users?ids=1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "users"
+          ],
+          "query": [
+            {
+              "key": "ids",
+              "value": "1",
+              "description": "id пользователей"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Удаление дизлайка - успех",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/events/:eventId/evaluate?operation=DISLIKE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ":eventId",
+            "evaluate"
+          ],
+          "query": [
+            {
+              "key": "operation",
+              "value": "DISLIKE"
+            }
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "3",
+              "description": "(Required) id текущего пользователя"
+            },
+            {
+              "key": "eventId",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Проверка рейтинга события после удаления дизлайка",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Событие должно содержать поля: countLike, countDislike, rating\", function () {\r",
+              "pm.expect(target).to.have.property('countLike');\r",
+              "pm.expect(target).to.have.property('countDislike');\r",
+              "pm.expect(target).to.have.property('rating');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать\", function () {\r",
+              "    pm.expect(1).equal(target.countLike, 'Кол-во лайков не соответствует');\r",
+              "    pm.expect(0).equal(target.countDislike, 'Кол-во дизлайков не соответствует');\r",
+              "    pm.expect(10.0).equal(target.rating, 'Рейтинг не соответствует');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/events/:id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        },
+        "description": "Обратите внимание:\n- событие должно быть опубликовано\n- информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов\n- информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики"
+      },
+      "response": []
+    },
+    {
+      "name": "Удаление лайка - успех",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/events/:eventId/evaluate?operation=LIKE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ":eventId",
+            "evaluate"
+          ],
+          "query": [
+            {
+              "key": "operation",
+              "value": "LIKE"
+            }
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "2",
+              "description": "(Required) id текущего пользователя"
+            },
+            {
+              "key": "eventId",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Проверка рейтинга события после удаления лайка",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Событие должно содержать поля: countLike, countDislike, rating\", function () {\r",
+              "pm.expect(target).to.have.property('countLike');\r",
+              "pm.expect(target).to.have.property('countDislike');\r",
+              "pm.expect(target).to.have.property('rating');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать\", function () {\r",
+              "    pm.expect(0).equal(target.countLike, 'Кол-во лайков не соответствует');\r",
+              "    pm.expect(0).equal(target.countDislike, 'Кол-во дизлайков не соответствует');\r",
+              "    pm.expect(0).equal(target.rating, 'Рейтинг не соответствует');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/events/:id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1",
+              "description": "(Required) id события"
+            }
+          ]
+        },
+        "description": "Обратите внимание:\n- событие должно быть опубликовано\n- информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов\n- информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "name",
+      "value": ""
+    },
+    {
+      "key": "usersCount",
+      "value": 1
+    },
+    {
+      "key": "catid",
+      "value": 1
+    },
+    {
+      "key": "request_body",
+      "value": ""
+    },
+    {
+      "key": "mail",
+      "value": ""
+    },
+    {
+      "key": "response",
+      "value": ""
+    },
+    {
+      "key": "uid",
+      "value": 1
+    },
+    {
+      "key": "catname",
+      "value": ""
+    },
+    {
+      "key": "eid",
+      "value": 1
+    },
+    {
+      "key": "compid",
+      "value": 1
+    },
+    {
+      "key": "toCheck",
+      "value": ""
+    },
+    {
+      "key": "newDataToSet",
+      "value": ""
+    },
+    {
+      "key": "uid1",
+      "value": ""
+    },
+    {
+      "key": "reqid",
+      "value": 1
+    },
+    {
+      "key": "catId",
+      "value": ""
+    },
+    {
+      "key": "confirmedRequests",
+      "value": ""
+    },
+    {
+      "key": "responseArr",
+      "value": ""
+    },
+    {
+      "key": "source1",
+      "value": ""
+    },
+    {
+      "key": "source2",
+      "value": ""
+    },
+    {
+      "key": "fromId",
+      "value": "0"
+    },
+    {
+      "key": "source",
+      "value": ""
+    }
+  ]
+}
