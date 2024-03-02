@@ -3,6 +3,7 @@ package ru.practicum.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.CompilationMapper;
@@ -28,6 +29,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationMapper compilationMapper;
 
     @Override
+    @Transactional
     public CompilationDto create(Compilation compilation) {
 
         List<Event> realEvents = prepareRealEvent(compilation);
@@ -39,6 +41,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto update(Long compId, Compilation compilation) {
 
         Compilation savedCompilation = checkExistsCompilation(compId);
@@ -54,6 +57,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long compId) {
         checkExistsCompilation(compId);
         compilationRepository.deleteById(compId);

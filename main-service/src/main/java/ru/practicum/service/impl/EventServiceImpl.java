@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.StatClient;
 import ru.practicum.dto.EventDto;
 import ru.practicum.exception.ConflictException;
@@ -24,7 +25,6 @@ import ru.practicum.storage.specification.EventSpecification;
 import ru.practicum.utils.enums.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,6 +58,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public Event create(Long userId, Event event) {
 
         event.setInitiator(userService.checkExistUserById(userId));
@@ -69,6 +70,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public Event update(Long userId, Long eventId, Event event) {
 
         Event savedEvent = checkExistEventById(eventId);

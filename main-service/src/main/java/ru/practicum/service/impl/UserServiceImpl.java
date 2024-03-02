@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.entity.Event;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public User create(User user) {
         checkDoubleUserEmail(user);
         return userRepository.save(user);
@@ -42,6 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long userId) {
         checkExistUserById(userId);
         userRepository.deleteById(userId);
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void updateRatingUser(User user) {
         List<Event> events = eventRepository.findAllByInitiator_Id(user.getId(), null).orElse(Collections.emptyList());
 
