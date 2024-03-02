@@ -1,16 +1,15 @@
 package ru.practicum.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-import java.time.LocalDateTime;
 
 @Data
 @Schema(name = "Событие", description = "ДТО фиксации статистики")
+@Builder
 public class EventDto {
 
     @Schema(description = "Идентификатор сервиса для которого записывается информация", example = "ewm-main-service")
@@ -28,7 +27,5 @@ public class EventDto {
     @Schema(description = "Дата и время, когда был совершен запрос к эндпоинту (в формате \"yyyy-MM-dd HH:mm:ss\")",
             example = "2022-09-06 11:00:23")
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    @Past
-    private LocalDateTime timestamp;
+    private String timestamp;
 }
