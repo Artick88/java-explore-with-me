@@ -75,4 +75,13 @@ public class EventFullDto {
 
     @Schema(description = "Количество просмотрев события", example = "999")
     private Integer views;
+
+    @Schema(description = "Кол-во лайков")
+    private Integer countLike;
+
+    @Schema(description = "Кол-во дизлайков")
+    private Integer countDislike;
+
+    @Schema(description = "Рейтинг")
+    private Float rating;
 }

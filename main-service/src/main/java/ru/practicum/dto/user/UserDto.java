@@ -21,4 +21,8 @@ public class UserDto {
     @Schema(description = "Имя", example = "Иван Петров")
     @NotBlank
     private String name;
+
+    @Schema(description = "Рейтинг")
+    private Float rating;
+
 }

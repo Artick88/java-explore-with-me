@@ -16,4 +16,6 @@ public interface UserService {
 
     User checkExistUserById(Long userId);
 
+    void updateRatingUser(User user);
+
 }

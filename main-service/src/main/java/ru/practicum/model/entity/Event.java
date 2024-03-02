@@ -64,4 +64,13 @@ public class Event {
 
     @Column(name = "views")
     private Integer views;
+
+    @Column(name = "count_like")
+    private Integer countLike;
+
+    @Column(name = "count_dislike")
+    private Integer countDislike;
+
+    @Column(name = "rating")
+    private Float rating;
 }

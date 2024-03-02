@@ -27,4 +27,5 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     @Query("update Request r set r.status = ?2 where r.id in (?1)")
     void updateStatusByIds(List<Long> ids, StatusRequest status);
 
+    Optional<Request> findByRequesterAndEventAndStatus(Long user, Long eventId, StatusRequest statusRequest);
 }

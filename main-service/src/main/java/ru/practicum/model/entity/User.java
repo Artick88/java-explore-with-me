@@ -23,4 +23,7 @@ public class User {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "rating")
+    private Float rating;
+
 }

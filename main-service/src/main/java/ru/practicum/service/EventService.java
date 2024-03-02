@@ -3,6 +3,7 @@ package ru.practicum.service;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.model.EventStat;
 import ru.practicum.model.entity.Event;
+import ru.practicum.utils.enums.EvaluateEventType;
 import ru.practicum.utils.enums.SortEvent;
 import ru.practicum.utils.enums.StateEvent;
 
@@ -33,5 +34,9 @@ public interface EventService {
 
     List<EventStat> searchAdmin(List<Long> users, List<StateEvent> states, List<Long> categories, LocalDateTime rangeStart,
                                 LocalDateTime rangeEnd, Pageable page);
+
+    void addEventEvaluate(Long userId, Long eventId, EvaluateEventType operation);
+
+    void deleteEventEvaluate(Long userId, Long eventId, EvaluateEventType operation);
 
 }

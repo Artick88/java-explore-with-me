@@ -14,6 +14,7 @@ import ru.practicum.mapper.UpdateEventMapper;
 import ru.practicum.service.EventService;
 import ru.practicum.service.RequestService;
 import ru.practicum.utils.PaginationCustom;
+import ru.practicum.utils.enums.EvaluateEventType;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -94,5 +95,26 @@ public class PrivateEventController {
                 requestService.updateStatus(userId, eventId, requestMapper.toUpdateRequest(request)));
         log.info("User get request event success");
         return result;
+    }
+
+    @PostMapping("/{eventId}/evaluate")
+    @Operation(summary = "Оценка события участником")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void evaluateEvent(@PathVariable Long userId,
+                              @PathVariable Long eventId,
+                              @RequestParam String operation) {
+        log.info("User {} for event {} operation {}", userId, eventId, operation);
+        eventService.addEventEvaluate(userId, eventId, EvaluateEventType.fromStringIgnoreCase(operation));
+        log.info("User {} for event {} operation {} - success", userId, eventId, operation);
+    }
+
+    @DeleteMapping("/{eventId}/evaluate")
+    @Operation(summary = "Отмена оценки события участником")
+    public void deleteEvaluateEvent(@PathVariable Long userId,
+                                    @PathVariable Long eventId,
+                                    @RequestParam String operation) {
+        log.info("User {} for event {} canceled operation {}", userId, eventId, operation);
+        eventService.deleteEventEvaluate(userId, eventId, EvaluateEventType.fromStringIgnoreCase(operation));
+        log.info("User {} for event {} canceled operation {} - success", userId, eventId, operation);
     }
 }
