@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.StatClient;
 import ru.practicum.dto.EventDto;
 import ru.practicum.exception.ConflictException;
@@ -13,19 +14,17 @@ import ru.practicum.exception.NotValidRequestException;
 import ru.practicum.mapper.UpdateEventMapper;
 import ru.practicum.model.EventStat;
 import ru.practicum.model.entity.Event;
+import ru.practicum.model.entity.EventEvaluate;
 import ru.practicum.service.CategoryService;
 import ru.practicum.service.EventService;
 import ru.practicum.service.UserService;
+import ru.practicum.storage.repository.EventEvaluateRepository;
 import ru.practicum.storage.repository.EventRepository;
 import ru.practicum.storage.repository.RequestRepository;
 import ru.practicum.storage.specification.EventSpecification;
-import ru.practicum.utils.enums.ReasonExceptionEnum;
-import ru.practicum.utils.enums.SortEvent;
-import ru.practicum.utils.enums.StateEvent;
-import ru.practicum.utils.enums.StatusRequest;
+import ru.practicum.utils.enums.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -40,6 +39,8 @@ public class EventServiceImpl implements EventService {
     @Value("${stats.service.app.name}")
     private String appName;
 
+    //Рейтинг по 10-ти бальной шкале
+    private static final int RATING_SCALE = 10;
     private static final int MIN_HOURS_DIFF_FOR_EVENT_DATE_FROM_CURRENT_DATE = 2;
     private static final int ADMIN_MIN_HOURS_DIFF_FOR_PUBLISHED_DATE_FROM_EVENT_DATE = 1;
 
@@ -49,6 +50,7 @@ public class EventServiceImpl implements EventService {
     private final StatClient statClient;
     private final UpdateEventMapper updateEventMapper;
     private final RequestRepository requestRepository;
+    private final EventEvaluateRepository eventEvaluateRepository;
 
     @Override
     public List<Event> getAllByIds(List<Long> eventIds) {
@@ -56,6 +58,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public Event create(Long userId, Event event) {
 
         event.setInitiator(userService.checkExistUserById(userId));
@@ -67,6 +70,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public Event update(Long userId, Long eventId, Event event) {
 
         Event savedEvent = checkExistEventById(eventId);
@@ -167,6 +171,68 @@ public class EventServiceImpl implements EventService {
         return prepareEventState(eventRepository.findAll(specificationSearch, page).stream().collect(Collectors.toList()));
     }
 
+    @Override
+    @Transactional
+    public void addEventEvaluate(Long userId, Long eventId, EvaluateEventType operation) {
+        userService.checkExistUserById(userId);
+        Event event = checkExistEventById(eventId);
+        requestRepository.findByRequesterAndEventAndStatus(userId, eventId, StatusRequest.CONFIRMED)
+                .orElseThrow(() -> new NotFoundException("Not found confirmed request", ReasonExceptionEnum.NOT_FOUND.getReason()));
+
+        if (eventEvaluateRepository.existsByUserIdAndEventId(userId, eventId)) {
+            throw new ConflictException("Double evaluate", ReasonExceptionEnum.CONFLICT.getReason());
+        }
+
+        if (!event.getState().equals(StateEvent.PUBLISHED)) {
+            throw new ConflictException("Event not published", ReasonExceptionEnum.BAD_PARAMETER.getReason());
+        }
+
+        if (event.getEventDate().isAfter(LocalDateTime.now())) {
+            throw new ConflictException("Event not completed", ReasonExceptionEnum.CONFLICT.getReason());
+        }
+
+        EventEvaluate evaluate = EventEvaluate.builder()
+                .userId(userId)
+                .eventId(eventId)
+                .evaluate(operation)
+                .build();
+
+        eventEvaluateRepository.save(evaluate);
+
+        //Обновим счетчик на событии
+        if (operation.equals(EvaluateEventType.LIKE)) {
+            event.setCountLike(Optional.ofNullable(event.getCountLike()).orElse(0) + 1);
+        } else {
+            event.setCountDislike(Optional.ofNullable(event.getCountDislike()).orElse(0) + 1);
+        }
+
+        //Пересчитаем рейтинг на событии и инициаторе
+        updateRatingEvent(event);
+        userService.updateRatingUser(event.getInitiator());
+    }
+
+    @Override
+    @Transactional
+    public void deleteEventEvaluate(Long userId, Long eventId, EvaluateEventType operation) {
+        userService.checkExistUserById(userId);
+        Event event = checkExistEventById(eventId);
+        EventEvaluate evaluate = eventEvaluateRepository.findByUserIdAndEventIdAndEvaluate(userId, eventId, operation)
+                .orElseThrow(() -> new NotFoundException("Not found", ReasonExceptionEnum.NOT_FOUND.getReason()));
+
+        eventEvaluateRepository.deleteById(evaluate.getId());
+
+        //Обновим счетчик на событии
+        if (operation.equals(EvaluateEventType.LIKE)) {
+            event.setCountLike(event.getCountLike() - 1);
+        } else {
+            event.setCountDislike(event.getCountDislike() - 1);
+        }
+
+        //Пересчитаем рейтинг на событии и инициаторе
+        updateRatingEvent(event);
+        userService.updateRatingUser(event.getInitiator());
+    }
+
     private List<EventStat> prepareEventState(List<Event> events) {
         return events.stream()
                 .map(event -> EventStat.builder().event(event).build())
@@ -238,5 +304,18 @@ public class EventServiceImpl implements EventService {
                 .uri(httpServletRequest.getRequestURI())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build());
+    }
+
+    private void updateRatingEvent(Event event) {
+
+        float countLike = event.getCountLike().floatValue();
+        float countDislike = event.getCountDislike().floatValue();
+        float rating = 0;
+
+        if (countLike != 0 || countDislike != 0) {
+            rating = RATING_SCALE * countLike / (countLike + countDislike);
+        }
+
+        event.setRating(rating);
     }
 }

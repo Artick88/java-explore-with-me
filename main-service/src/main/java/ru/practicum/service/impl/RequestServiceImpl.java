@@ -33,6 +33,7 @@ public class RequestServiceImpl implements RequestService {
     private final EventService eventService;
 
     @Override
+    @Transactional
     public Request create(Long userId, Long eventId, HttpServletRequest httpServletRequest) {
         //Это нужно для тестов, иначе не проходят....
         LocalDateTime timeCreationRequest = LocalDateTime.ofInstant(Instant
@@ -42,6 +43,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public Request cancelRequest(Long userId, Long requestId) {
         Request savedRequest = validateCancelRequest(userId, requestId);
         savedRequest.setStatus(StatusRequest.CANCELED);
@@ -54,8 +56,8 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.findAllByRequester(userId).orElse(new ArrayList<>());
     }
 
-    @Transactional
     @Override
+    @Transactional
     public List<Request> updateStatus(Long userId, Long eventId, UpdateRequest updateRequest) {
 
         userService.checkExistUserById(userId);
